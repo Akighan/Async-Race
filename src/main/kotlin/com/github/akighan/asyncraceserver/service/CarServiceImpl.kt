@@ -29,7 +29,7 @@ class CarServiceImp @Autowired constructor(val carRepository: CarRepository) : C
     override fun saveCar(car: Car): Car {
         if (car.color.isEmpty()) throw IllegalArgumentException("Car color must not be empty")
         if (car.name.isEmpty()) throw IllegalArgumentException("Car name must not be empty")
-
+        car.engine = Engine()
         return carRepository.saveAndFlush(car)
     }
 
@@ -38,7 +38,7 @@ class CarServiceImp @Autowired constructor(val carRepository: CarRepository) : C
         if (!carRepository.existsById(carId)) throw NoSuchElementException("Car with id ${car.id} does not exist!")
         if (car.color.isEmpty()) throw IllegalArgumentException("Car color must not be empty")
         if (car.name.isEmpty()) throw IllegalArgumentException("Car name must not be empty")
-        carRepository.saveAndFlush(Car(carId, car.color, car.name))
+        carRepository.saveAndFlush(Car(carId, car.color, car.name, Engine()))
         return carRepository.getById(carId)
     }
 
@@ -51,17 +51,6 @@ class CarServiceImp @Autowired constructor(val carRepository: CarRepository) : C
         val carId = id.toIntOrNull() ?: throw IllegalArgumentException("fail to get car with illegal argument $id!")
         if (!carRepository.existsById(carId)) throw NoSuchElementException("Car with id $carId does not exist!")
         carRepository.deleteById(carId)
-    }
-
-    override fun startOrStopEngine(id: String, status: String): Engine {
-        val carId = id.toIntOrNull() ?: throw IllegalArgumentException("fail to get car with illegal argument $id!")
-        val car =
-            carRepository.findById(carId).orElseThrow { NoSuchElementException("Car with id $id does not exist!") }
-        return if (Engine.Status.valueOf(status) == Engine.Status.STARTED)
-            car.onStartEngine()
-        else if (Engine.Status.valueOf(status) == Engine.Status.STOPPED)
-            car.onStopEngine()
-        else throw IllegalArgumentException("fail to get status $status")
     }
 
     override fun switchToDriveMode(): Engine {

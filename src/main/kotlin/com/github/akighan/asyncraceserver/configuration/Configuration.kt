@@ -1,6 +1,7 @@
 package com.github.akighan.asyncraceserver.configuration
 
 import com.github.akighan.asyncraceserver.model.Car
+import com.github.akighan.asyncraceserver.model.Engine
 import com.github.akighan.asyncraceserver.model.Winner
 import com.github.akighan.asyncraceserver.repository.CarRepository
 import com.github.akighan.asyncraceserver.repository.WinnersRepository
@@ -13,7 +14,7 @@ class Configuration @Autowired constructor(val carRepository: CarRepository, val
 
     @Bean
     fun saveCars() {
-        carRepository.saveAll(listOf(Car(_name = "Lamborgini", _color = "Red")))
+        carRepository.saveAll(listOf(Car(_name = "Lamborgini", _color = "Red", _engine = Engine())))
         winnerRepository.saveAll(listOf(Winner (_wins = 1, _time = 2.02)))
     }
 }

@@ -1,12 +1,20 @@
 package com.github.akighan.asyncraceserver.model
 
-abstract class Engine {
+import javax.persistence.*
+
+@Entity
+@Table(name = "engine")
+class Engine {
+    @Id
+    @GeneratedValue (strategy = GenerationType.AUTO)
+    @Column(name="id")
+    var id:Int = 0
     val distance:Int = 50000
     var velocity:Int = 0
     var status:Enum<Status> = Status.STOPPED
-    abstract fun onStartEngine():Car
-    abstract fun onStopEngine():Car
-    abstract fun driveMode():Boolean
+
+    @OneToOne(mappedBy = "engine")
+    val car:Car? = null
 
     enum class Status {
         STARTED, STOPPED, DRIVE
