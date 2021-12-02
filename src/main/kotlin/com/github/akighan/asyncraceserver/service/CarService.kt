@@ -10,6 +10,5 @@ interface CarService {
     fun updateCar(id:String, car: Car): Car
     fun getCar(id:String):Car
     fun deleteCar(id: String)
-    fun startOrStopEngine(id:String, status:String):Engine
     fun switchToDriveMode():Engine
 }

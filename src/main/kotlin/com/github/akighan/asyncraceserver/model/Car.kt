@@ -7,8 +7,9 @@ import javax.persistence.*
 class Car(
     _id: Int = 0,
     _name: String = "",
-    _color: String = ""
-): Engine() {
+    _color: String = "",
+    _engine: Engine? = null
+) {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "carSeq")
@@ -17,24 +18,9 @@ class Car(
     val id: Int = _id
     val name: String = _name
     val color: String = _color
-
-    override fun onStartEngine():Car {
-        this.velocity = (10..100).random()
-        this.status = Status.STARTED
-        return this
-    }
-
-    override fun onStopEngine():Car {
-        this.status = Status.STOPPED
-        return this
-    }
-
-    override fun driveMode(): Boolean {
-        return if (this.status == Status.STARTED) {
-            this.status = Status.DRIVE
-            true
-        } else false
-    }
+    @OneToOne(cascade = [CascadeType.ALL])
+    @JoinColumn(name = "engine_id", referencedColumnName = "id")
+    var engine:Engine? =  _engine
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
