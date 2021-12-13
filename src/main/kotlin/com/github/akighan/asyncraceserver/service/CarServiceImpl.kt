@@ -38,8 +38,7 @@ class CarServiceImp @Autowired constructor(val carRepository: CarRepository) : C
         if (!carRepository.existsById(carId)) throw NoSuchElementException("Car with id ${car.id} does not exist!")
         if (car.color.isEmpty()) throw IllegalArgumentException("Car color must not be empty")
         if (car.name.isEmpty()) throw IllegalArgumentException("Car name must not be empty")
-        carRepository.saveAndFlush(Car(carId, car.color, car.name, Engine()))
-        return carRepository.getById(carId)
+        return carRepository.saveAndFlush(Car(carId, car.color, car.name, Engine()))
     }
 
     override fun getCar(id: String): Car {
