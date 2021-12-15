@@ -4,18 +4,16 @@ import javax.persistence.*
 
 @Entity
 @Table
-open class Car() {
+class Car() {
 
     constructor(
         id: Int,
         name: String,
-        color: String,
-        engine: Engine?
+        color: String
     ) : this() {
         this.id = id
         this.name = name
         this.color = color
-        this.engine = engine
     }
 
     @Id
@@ -26,7 +24,7 @@ open class Car() {
     var name: String = ""
     var color: String = ""
 
-    @OneToOne(cascade = [CascadeType.ALL])
+    @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     @JoinColumn(name = "engine_id", referencedColumnName = "id")
     var engine: Engine? = null
 
@@ -42,4 +40,9 @@ open class Car() {
     }
 
     override fun hashCode(): Int = id
+
+
+    override fun toString(): String {
+        return "Car(id=$id, name='$name', color='$color')"
+    }
 }

@@ -4,18 +4,22 @@ import javax.persistence.*
 
 @Entity
 @Table
-class Winner (
-    _id:Int = 0,
-    _wins:Int = 0,
-    _time:Double = 0.0
-        ){
+class Winner() {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "winSeq")
-    @SequenceGenerator(name = "winSeq", initialValue = 1, allocationSize = 1, sequenceName = "Win_Seq")
     @Column(name = "id")
-    val id: Int = _id
-    val wins:Int = _wins
-    val time:Double = _time
+    var id: Int = 0
+    var wins: Int = 0
+    var time: Double = 0.0
+
+    constructor(
+        id: Int,
+        time: Double,
+        wins: Int
+    ) : this() {
+        this.id = id
+        this.time = time
+        this.wins = wins
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

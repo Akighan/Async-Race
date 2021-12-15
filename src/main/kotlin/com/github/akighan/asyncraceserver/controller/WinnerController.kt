@@ -32,7 +32,6 @@ class WinnerController @Autowired constructor(
         ResponseEntity(e.message, HttpStatus.NOT_FOUND)
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     @CrossOrigin(
         allowedHeaders = ["X-Total-Count"],
         exposedHeaders = ["X-Total-Count"]
@@ -44,7 +43,7 @@ class WinnerController @Autowired constructor(
         @RequestParam(name = "_order", defaultValue = "ASC") order: String
     ): ResponseEntity<List<GetWinnerResponseDto>> {
         val response = HttpHeaders()
-        response.add(
+        response.set(
             "X-Total-Count",
             winnerService.getNumberOfWinners().toString()
         )
@@ -60,7 +59,7 @@ class WinnerController @Autowired constructor(
         ResponseEntity.ok().body(modelMapper.map(winnerService.getWinner(id), GetWinnerResponseDto::class.java))
 
     @PostMapping
-    fun addWinner(postWinnerRequestDto: PostWinnerRequestDto): ResponseEntity<PostWinnerResponseDto> {
+    fun addWinner(@RequestBody postWinnerRequestDto: PostWinnerRequestDto): ResponseEntity<PostWinnerResponseDto> {
         val requestWinner: Winner = modelMapper.map(postWinnerRequestDto, Winner::class.java)
         val responseWinner: Winner = winnerService.saveWinner(requestWinner)
         return ResponseEntity.created(URI.create("/winners/" + responseWinner.id))

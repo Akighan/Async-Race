@@ -2,13 +2,14 @@ package com.github.akighan.asyncraceserver.controller.dto.request.winner
 
 class PostWinnerRequestDto() {
     var id: Int = 0
-    var wins: Int = 0
     var time: Double = 0.0
+    var wins: Int = 0
 
-    constructor(id: Int, wins: Int, time: Double) : this() {
+
+    constructor(id: Int,time: Double, wins: Int) : this() {
         this.id = id
-        this.wins = wins
         this.time = time
+        this.wins = wins
     }
 
     override fun equals(other: Any?): Boolean {

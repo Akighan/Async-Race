@@ -1,7 +1,6 @@
 package com.github.akighan.asyncraceserver.service
 
 import com.github.akighan.asyncraceserver.model.Car
-import com.github.akighan.asyncraceserver.model.Engine
 
 interface CarService {
     fun getNumberOfCars():Long
@@ -10,5 +9,4 @@ interface CarService {
     fun updateCar(id:String, car: Car): Car
     fun getCar(id:String):Car
     fun deleteCar(id: String)
-    fun switchToDriveMode():Engine
 }
