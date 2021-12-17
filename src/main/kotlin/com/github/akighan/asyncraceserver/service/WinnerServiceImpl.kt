@@ -4,6 +4,7 @@ import com.github.akighan.asyncraceserver.model.Winner
 import com.github.akighan.asyncraceserver.repository.WinnersRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.PathVariable
 import java.lang.IllegalArgumentException
 
 @Service

@@ -1,18 +1,24 @@
 package com.github.akighan.asyncraceserver.controller
 
+import com.github.akighan.asyncraceserver.controller.dto.request.car.PostCarRequestDto
+import com.github.akighan.asyncraceserver.controller.dto.request.car.UpdateCarRequestDto
+import com.github.akighan.asyncraceserver.controller.dto.response.car.GetCarResponseDto
+import com.github.akighan.asyncraceserver.controller.dto.response.car.PostCarResponseDto
+import com.github.akighan.asyncraceserver.controller.dto.response.car.UpdateCarResponseDto
 import com.github.akighan.asyncraceserver.model.Car
 import com.github.akighan.asyncraceserver.service.CarService
+import org.modelmapper.ModelMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import javax.servlet.http.HttpServletResponse
+import java.net.URI
 
 @CrossOrigin
 @RestController
 @RequestMapping("/garage")
-class CarController @Autowired constructor(val carService: CarService) {
+class CarController @Autowired constructor(val carService: CarService, val modelMapper: ModelMapper) {
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleBadRequest(e: IllegalArgumentException) =
@@ -22,6 +28,7 @@ class CarController @Autowired constructor(val carService: CarService) {
     fun handleNotFound(e: NoSuchElementException) =
         ResponseEntity(e.message, HttpStatus.NOT_FOUND)
 
+
     @GetMapping()
     @CrossOrigin(
         allowedHeaders = ["X-Total-Count"],
@@ -30,27 +37,42 @@ class CarController @Autowired constructor(val carService: CarService) {
     fun getAllCars(
         @RequestParam(name = "_page", defaultValue = "1") _page: String,
         @RequestParam(name = "_limit", defaultValue = "7") _limit: String
-    ): ResponseEntity<List<Car>> {
+    ): ResponseEntity<List<GetCarResponseDto>> {
         val response = HttpHeaders()
         response.set("X-Total-Count", carService.getNumberOfCars().toString())
         return ResponseEntity.ok().headers(response)
-            .body(carService.getAllCars(_page, _limit))
+            .body(carService.getAllCars(_page, _limit).map {
+                modelMapper.map(it, GetCarResponseDto::class.java)
+            })
     }
 
     @GetMapping("/{id}")
-    fun getCar(@PathVariable id: String): Car = carService.getCar(id)
+    fun getCar(@PathVariable id: String): ResponseEntity<GetCarResponseDto> {
+        return ResponseEntity.ok().body(modelMapper.map(carService.getCar(id), GetCarResponseDto::class.java))
+    }
 
     @PostMapping()
-    @ResponseStatus(HttpStatus.CREATED)
-    fun addCar(@RequestBody car: Car): Car = carService.saveCar(car)
+    fun addCar(@RequestBody postCarRequestDto: PostCarRequestDto): ResponseEntity<PostCarResponseDto> {
+        val requestCar: Car = modelMapper.map(postCarRequestDto, Car::class.java)
+        val responseCar: Car = carService.saveCar(requestCar)
+        return ResponseEntity.created(URI.create("/garage/" + responseCar.id))
+            .body(modelMapper.map(responseCar, PostCarResponseDto::class.java))
+    }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    fun updateCar(@PathVariable id: String, @RequestBody car: Car): Car = carService.updateCar(id, car)
+    fun updateCar(
+        @PathVariable id: String,
+        @RequestBody updateCarRequestDto: UpdateCarRequestDto
+    ): ResponseEntity<UpdateCarResponseDto> {
+        val car: Car = modelMapper.map(updateCarRequestDto, Car::class.java)
+
+        return ResponseEntity.accepted()
+            .body(modelMapper.map(carService.updateCar(id, car), UpdateCarResponseDto::class.java))
+    }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    fun deleteCar(@RequestBody id: String) {
+    fun deleteCar(@PathVariable id: String) {
         carService.deleteCar(id)
     }
 }

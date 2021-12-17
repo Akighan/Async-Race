@@ -4,23 +4,29 @@ import javax.persistence.*
 
 @Entity
 @Table
-class Car(
-    _id: Int = 0,
-    _name: String = "",
-    _color: String = "",
-    _engine: Engine? = null
-) {
+class Car() {
+
+    constructor(
+        id: Int,
+        name: String,
+        color: String
+    ) : this() {
+        this.id = id
+        this.name = name
+        this.color = color
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "carSeq")
     @SequenceGenerator(name = "carSeq", initialValue = 1, allocationSize = 1, sequenceName = "Car_Seq")
     @Column(name = "id")
-    val id: Int = _id
-    val name: String = _name
-    val color: String = _color
-    @OneToOne(cascade = [CascadeType.ALL])
+    var id: Int = 0
+    var name: String = ""
+    var color: String = ""
+
+    @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     @JoinColumn(name = "engine_id", referencedColumnName = "id")
-    var engine:Engine? =  _engine
+    var engine: Engine? = null
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -34,4 +40,9 @@ class Car(
     }
 
     override fun hashCode(): Int = id
+
+
+    override fun toString(): String {
+        return "Car(id=$id, name='$name', color='$color')"
+    }
 }
