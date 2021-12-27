@@ -5,7 +5,6 @@ import com.github.akighan.asyncraceserver.controller.dto.request.car.UpdateCarRe
 import com.github.akighan.asyncraceserver.controller.dto.response.car.GetCarResponseDto
 import com.github.akighan.asyncraceserver.controller.dto.response.car.PostCarResponseDto
 import com.github.akighan.asyncraceserver.controller.dto.response.car.UpdateCarResponseDto
-import com.github.akighan.asyncraceserver.model.Car
 import com.github.akighan.asyncraceserver.service.CarService
 import org.modelmapper.ModelMapper
 import org.springframework.beans.factory.annotation.Autowired
@@ -53,10 +52,9 @@ class CarController @Autowired constructor(val carService: CarService, val model
 
     @PostMapping()
     fun addCar(@RequestBody postCarRequestDto: PostCarRequestDto): ResponseEntity<PostCarResponseDto> {
-        val requestCar: Car = modelMapper.map(postCarRequestDto, Car::class.java)
-        val responseCar: Car = carService.saveCar(requestCar)
+        val responseCar: PostCarResponseDto = carService.saveCar(postCarRequestDto)
         return ResponseEntity.created(URI.create("/garage/" + responseCar.id))
-            .body(modelMapper.map(responseCar, PostCarResponseDto::class.java))
+            .body(carService.saveCar(postCarRequestDto))
     }
 
     @PutMapping("/{id}")
@@ -64,10 +62,8 @@ class CarController @Autowired constructor(val carService: CarService, val model
         @PathVariable id: String,
         @RequestBody updateCarRequestDto: UpdateCarRequestDto
     ): ResponseEntity<UpdateCarResponseDto> {
-        val car: Car = modelMapper.map(updateCarRequestDto, Car::class.java)
-
         return ResponseEntity.accepted()
-            .body(modelMapper.map(carService.updateCar(id, car), UpdateCarResponseDto::class.java))
+            .body(carService.updateCar(id, updateCarRequestDto))
     }
 
     @DeleteMapping("/{id}")
