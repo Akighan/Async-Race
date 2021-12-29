@@ -1,14 +1,19 @@
 package com.github.akighan.asyncraceserver.service
 
+import com.github.akighan.asyncraceserver.controller.dto.request.winner.PostWinnerRequestDto
+import com.github.akighan.asyncraceserver.controller.dto.request.winner.UpdateWinnerRequestDto
+import com.github.akighan.asyncraceserver.controller.dto.response.winner.PostWinnerResponseDto
+import com.github.akighan.asyncraceserver.controller.dto.response.winner.UpdateWinnerResponseDto
 import com.github.akighan.asyncraceserver.model.Winner
 import com.github.akighan.asyncraceserver.repository.WinnersRepository
+import org.modelmapper.ModelMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.PathVariable
 import java.lang.IllegalArgumentException
 
 @Service
-class WinnerServiceImpl @Autowired constructor(val winnersRepository: WinnersRepository) : WinnerService {
+class WinnerServiceImpl @Autowired constructor(val winnersRepository: WinnersRepository, val modelMapper: ModelMapper) :
+    WinnerService {
     override fun getWinners(page: String, limit: String, sort: String, order: String): List<Winner> {
         val winners: List<Winner>
         when (sort) {
@@ -53,9 +58,10 @@ class WinnerServiceImpl @Autowired constructor(val winnersRepository: WinnersRep
             .orElseThrow { NoSuchElementException("Car with id $id does not exist!") }
     }
 
-    override fun saveWinner(winner: Winner): Winner {
-        if (winnersRepository.existsById(winner.id)) throw IllegalArgumentException("insert failed, duplicated id ${winner.id}")
-        return winnersRepository.saveAndFlush(winner)
+    override fun saveWinner(postWinnerRequestDto: PostWinnerRequestDto): PostWinnerResponseDto {
+        if (winnersRepository.existsById(postWinnerRequestDto.id)) throw IllegalArgumentException("insert failed, duplicated id ${postWinnerRequestDto.id}")
+        val winner: Winner = modelMapper.map(postWinnerRequestDto, Winner::class.java)
+        return modelMapper.map(winnersRepository.saveAndFlush(winner), PostWinnerResponseDto::class.java)
     }
 
     override fun deleteWinner(id: String) {
@@ -64,10 +70,12 @@ class WinnerServiceImpl @Autowired constructor(val winnersRepository: WinnersRep
         winnersRepository.deleteById(winnerId)
     }
 
-    override fun updateWinner(id: String, winner: Winner): Winner {
-        val winnerId = id.toIntOrNull() ?: throw IllegalArgumentException ("fail to get winner with illegal argument $id!")
-        if (!winnersRepository.existsById(winnerId)) throw NoSuchElementException("Winner with id ${winner.id} does not exist!")
-        winnersRepository.updateById(winnerId, winner.time, winner.wins)
-        return winnersRepository.getById(winnerId)
+    override fun updateWinner(id: String, updateWinnerRequestDto: UpdateWinnerRequestDto): UpdateWinnerResponseDto {
+        val winnerId =
+            id.toIntOrNull() ?: throw IllegalArgumentException("fail to get winner with illegal argument $id!")
+        if (!winnersRepository.existsById(winnerId)) throw NoSuchElementException("Winner with id $winnerId does not exist!")
+        val winner: Winner = modelMapper.map(updateWinnerRequestDto, Winner::class.java)
+        winner.id = winnerId
+        return modelMapper.map(winnersRepository.saveAndFlush(winner), UpdateWinnerResponseDto::class.java)
     }
 }

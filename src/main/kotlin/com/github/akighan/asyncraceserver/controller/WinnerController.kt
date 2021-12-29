@@ -5,7 +5,6 @@ import com.github.akighan.asyncraceserver.controller.dto.request.winner.UpdateWi
 import com.github.akighan.asyncraceserver.controller.dto.response.winner.UpdateWinnerResponseDto
 import com.github.akighan.asyncraceserver.controller.dto.response.winner.GetWinnerResponseDto
 import com.github.akighan.asyncraceserver.controller.dto.response.winner.PostWinnerResponseDto
-import com.github.akighan.asyncraceserver.model.Winner
 import com.github.akighan.asyncraceserver.service.WinnerService
 import org.modelmapper.ModelMapper
 import org.springframework.beans.factory.annotation.Autowired
@@ -60,10 +59,9 @@ class WinnerController @Autowired constructor(
 
     @PostMapping
     fun addWinner(@RequestBody postWinnerRequestDto: PostWinnerRequestDto): ResponseEntity<PostWinnerResponseDto> {
-        val requestWinner: Winner = modelMapper.map(postWinnerRequestDto, Winner::class.java)
-        val responseWinner: Winner = winnerService.saveWinner(requestWinner)
-        return ResponseEntity.created(URI.create("/winners/" + responseWinner.id))
-            .body(modelMapper.map(responseWinner, PostWinnerResponseDto::class.java))
+        val postWinnerResponseDto = winnerService.saveWinner(postWinnerRequestDto)
+        return ResponseEntity.created(URI.create("/winners/" + postWinnerResponseDto.id))
+            .body(postWinnerResponseDto)
     }
 
     @DeleteMapping("/{id}")
@@ -77,8 +75,7 @@ class WinnerController @Autowired constructor(
         @PathVariable id: String,
         @RequestBody updateWinnerRequest: UpdateWinnerRequestDto
     ): ResponseEntity<UpdateWinnerResponseDto> {
-        val requestWinner = modelMapper.map(updateWinnerRequest, Winner::class.java)
-        val responseWinner = winnerService.updateWinner(id, requestWinner)
-        return ResponseEntity.ok().body(modelMapper.map(responseWinner, UpdateWinnerResponseDto::class.java))
+        val responseWinner = winnerService.updateWinner(id, updateWinnerRequest)
+        return ResponseEntity.ok().body(responseWinner)
     }
 }
